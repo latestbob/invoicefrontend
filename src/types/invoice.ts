@@ -12,7 +12,7 @@
     customerName: string;
     dueDate: string;
     grandTotal: number;
-    items: InvoiceItem[];
+    items: string;
     status: string;
     uploadUrl?: string;
   }
