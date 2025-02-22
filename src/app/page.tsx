@@ -8,6 +8,7 @@ import moment from "moment";
 import { InvoiceItem } from "@/types/invoice";
 import { createInvoice } from "@/services/invoiceService";
 import { toast } from "react-toastify";
+import Link from "next/link";
 // import { toast } from "react-toastify";
 
 export default function Home() {
@@ -233,12 +234,12 @@ export default function Home() {
                     )}
                    </td>
                    <td className="p-3">
-                     <button className="text-blue-500 hover:text-blue-700 mr-2">
+                     <Link href={`/invoices/${invoice.id}`} className="text-blue-500 hover:text-blue-700 mr-2">
                        View
-                     </button>
-                     <button className="text-amber-500 hover:text-amber-700 mr-2">
+                     </Link>
+                     <Link href={`/invoices/${invoice.id}/edit`}  className="text-amber-500 hover:text-amber-700 mr-2">
                        Edit
-                     </button>
+                     </Link>
                      <button className="text-red-500 hover:text-red-700">
                        Delete
                      </button>

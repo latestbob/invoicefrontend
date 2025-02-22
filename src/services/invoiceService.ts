@@ -26,3 +26,15 @@ export async function createInvoice(invoiceData: InvoiceInterface) {
         throw error;
     }
 }
+
+///update invoice
+
+export async function updateInvoice(invoiceId: string, invoiceData: InvoiceInterface) {
+    try {
+        const response = await axios.put(`${API_BASE_URL}invoices/${invoiceId}`, invoiceData);
+        return response.data;
+    } catch (error: any) {
+        console.error("Failed to update invoice:", error.response?.data || error);
+        throw error;
+    }
+}
