@@ -6,10 +6,10 @@ import { useEffect, useState } from "react";
 import { InvoiceInterface } from "@/types/invoice";
 import moment from "moment";
 import { InvoiceItem } from "@/types/invoice";
-import { createInvoice } from "@/services/invoiceService";
+import { createInvoice, deleteInvoice } from "@/services/invoiceService";
 import { toast } from "react-toastify";
 import Link from "next/link";
-// import { toast } from "react-toastify";
+
 
 export default function Home() {
 
@@ -28,6 +28,7 @@ export default function Home() {
   }, []);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [items, setItems] = useState<InvoiceItem[]>([]);
   const [grandTotal, setGrandTotal] = useState<number>(0);
 
@@ -122,6 +123,28 @@ export default function Home() {
 
 
     setIsModalOpen(false); // Close the modal after submission
+  };
+
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
+
+  const handleDeleteClick = (invoiceId: string) => {
+    setSelectedInvoiceId(invoiceId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteInvoice = async () => {
+    if (!selectedInvoiceId) return;
+
+    try {
+     
+    await deleteInvoice(selectedInvoiceId);
+
+      toast.success("Invoice deleted successfully");
+      await loadInvoices();
+      setIsDeleteModalOpen(false);
+    } catch (error) {
+      toast.error("Failed to delete invoice");
+    }
   };
 
   
@@ -240,9 +263,14 @@ export default function Home() {
                      <Link href={`/invoices/${invoice.id}/edit`}  className="text-amber-500 hover:text-amber-700 mr-2">
                        Edit
                      </Link>
-                     <button className="text-red-500 hover:text-red-700">
-                       Delete
-                     </button>
+
+                    <button
+                      onClick={() => handleDeleteClick(invoice.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      Delete
+                    </button>
+                    
                    </td>
                  </tr>
               
@@ -385,6 +413,39 @@ export default function Home() {
             </button>
           </div>
         </form>
+          </div>
+        </div>
+      )}
+
+
+      {/* Delete Invoice Modal */}
+      {isDeleteModalOpen && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          onClick={() => setIsDeleteModalOpen(false)}
+        >
+          <div
+        className="bg-white rounded-lg shadow-lg p-6 w-[40%]"
+        onClick={(e) => e.stopPropagation()}
+          >
+        <h2 className="text-xl font-bold mb-4">Delete Invoice - {selectedInvoiceId && selectedInvoiceId}</h2>
+        <p>Are you sure you want to delete this invoice?</p>
+        <div className="flex justify-end mt-4">
+          <button
+            type="button"
+            onClick={() => setIsDeleteModalOpen(false)}
+            className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition duration-300 mr-2"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleDeleteInvoice}
+            className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300"
+          >
+            Delete
+          </button>
+        </div>
           </div>
         </div>
       )}

@@ -38,3 +38,15 @@ export async function updateInvoice(invoiceId: string, invoiceData: InvoiceInter
         throw error;
     }
 }
+
+//delete invoice
+
+export async function deleteInvoice(invoiceId: string) {
+    try {
+        const response = await axios.delete(`${API_BASE_URL}invoices/${invoiceId}`);
+        return response.data;
+    } catch (error: any) {
+        console.error("Failed to delete invoice:", error.response?.data || error);
+        throw error;
+    }
+}
