@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { updateInvoice } from "@/services/invoiceService";
 import { toast } from "react-toastify";
+import { uploadFileToCloudinary } from "@/services/uploadService";
 
 export default function EditInvoice({ invoice }: { invoice: any }) {
   const [formData, setFormData] = useState({
@@ -64,9 +65,29 @@ export default function EditInvoice({ invoice }: { invoice: any }) {
     }));
   };
 
+
+  const [file, setFile] = useState<File | null>(null);
+  const [uploadUrl, setUploadUrl] = useState("");
+
+  // Handle file change
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setFile(file);
+    }
+  };
+
+
   // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+
+    let fileUrl = "";
+    if (file) {
+      // Upload the file to Cloudinary
+      fileUrl = await uploadFileToCloudinary(file);
+      setUploadUrl(fileUrl);
+    }
 
     if (formData.items.length === 0) {
       toast.error("Items cannot be empty");
@@ -84,6 +105,7 @@ export default function EditInvoice({ invoice }: { invoice: any }) {
       items: JSON.stringify(formData.items), // Convert array to JSON string
       grandTotal: formData.grandTotal,
       status: formData.status,
+      uploadUrl: fileUrl,
     };
 
     try {
@@ -264,8 +286,10 @@ export default function EditInvoice({ invoice }: { invoice: any }) {
               <label className="block font-medium">Upload File (optional)</label>
               <input
                 type="file"
-                // onChange={handleFileChange}
+               
                 className="w-full p-2 border rounded-lg"
+                accept=".jpg,.jpeg,.png,.gif,.docx,.xlsx"
+                onChange={handleFileChange}
               />
             </div>
           </div>
