@@ -9,6 +9,7 @@ import { InvoiceItem } from "@/types/invoice";
 import { createInvoice, deleteInvoice } from "@/services/invoiceService";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { uploadFileToCloudinary } from "@/services/uploadService";
 
 
 export default function Home() {
@@ -90,11 +91,29 @@ export default function Home() {
     setGrandTotal(newGrandTotal);
   };
 
+
+  const [file, setFile] = useState<File | null>(null);
+  const [uploadUrl, setUploadUrl] = useState("");
+
+  // Handle file change
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setFile(file);
+    }
+  };
+
+
   // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
    
-   
+    let fileUrl = "";
+    if (file) {
+      // Upload the file to Cloudinary
+      fileUrl = await uploadFileToCloudinary(file);
+      setUploadUrl(fileUrl);
+    }
 
     if (items.length === 0) {
       toast.error("Items cannot be empty");
@@ -112,6 +131,7 @@ export default function Home() {
       items: JSON.stringify(items), // Convert array to JSON string
       grandTotal,
       status,
+      uploadUrl: fileUrl,
     };
 
     try {
@@ -291,6 +311,17 @@ export default function Home() {
                     >
                       Delete
                     </button>
+
+                    {invoice.uploadUrl && (
+                      <a
+                        href={invoice.uploadUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-600 hover:text-green-700 ml-2"
+                      >
+                        Attachment
+                      </a>
+                    )}
                     
                    </td>
                  </tr>
@@ -413,6 +444,8 @@ export default function Home() {
             <input
               type="file"
               className="w-1/2 p-2 border border-gray-300 rounded-md"
+               accept=".jpg,.jpeg,.png,.gif,.docx,.xlsx"
+              onChange={handleFileChange}
             />
             </div>
 
