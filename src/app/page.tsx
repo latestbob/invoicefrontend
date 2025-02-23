@@ -16,16 +16,24 @@ export default function Home() {
 
 
   const [invoices, setInvoices] = useState<any[]>([]);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [startDateFilter, setStartDateFilter] = useState("");
+  const [endDateFilter, setEndDateFilter] = useState("");
 
-  async function loadInvoices() {
-    const data = await fetchInvoices();
+ 
+  const loadInvoices = async () => {
+    const data = await fetchInvoices({
+      status: statusFilter,
+      startDate: startDateFilter,
+      endDate: endDateFilter,
+    });
     setInvoices(data);
-  }
+  };
 
   useEffect(() => {
   
     loadInvoices();
-  }, []);
+  }, [statusFilter, startDateFilter, endDateFilter]);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
@@ -175,10 +183,18 @@ export default function Home() {
             <select
               name="status"
               id="status"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Filter Status</option>
               {/* Add more options here */}
+
+              <option value="draft">Draft</option>
+              <option value="sent">Sent</option>
+              <option value="paid">Paid</option>
+              <option value="pending">Pending</option>
+              <option value="canceled">Canceled</option>
             </select>
           </div>
 
@@ -188,6 +204,9 @@ export default function Home() {
             <input
               type="date"
               name="start_date"
+             
+          value={startDateFilter}
+          onChange={(e) => setStartDateFilter(e.target.value)}
               id="startDate"
               className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -196,6 +215,8 @@ export default function Home() {
               type="date"
               name="end_date"
               id="endDate"
+              value={endDateFilter}
+          onChange={(e) => setEndDateFilter(e.target.value)}
               className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
