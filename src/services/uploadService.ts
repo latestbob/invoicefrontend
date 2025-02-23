@@ -3,7 +3,7 @@ import axios from "axios";
 export const uploadFileToCloudinary = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("upload_preset", "invoice"); // Replace with your upload preset name
+  formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || ''); // Replace with your upload preset name
 
   try {
     const response = await axios.post(
